@@ -1,23 +1,15 @@
 # -*- coding: utf-8 -*-
 """
 Created on Tue Feb  8 15:57:41 2022
-
-@author: mm16jdc
 """
 
-#need these two packages to read in the txt file.
 from io import StringIO
 import pandas as pd
 
-#the following packages are only needed for simple plotting
 import matplotlib.pyplot as plt
 import cartopy.crs as ccrs
 
-
-
-##plan:
-#1. Read in the text file and split into separate storms by creating a list of storms,
-#   by splitting the string on the word 'start'.
+#Split by 'start'
 
 with open('etc-all-traj.txt') as f: #location and filename of our storm txt file.
     file = f.read()
@@ -25,8 +17,8 @@ with open('etc-all-traj.txt') as f: #location and filename of our storm txt file
 storms = file.split('start')
 
 
-#2. Loop through these storms and format into a pandas dataframe, which are stored in a list.
-#   So we now have a list of dataframes, called 'dfs'.
+# Loop through these storms and format into a pandas dataframe list 'dfs'
+
 
 dfs=[]
 for storm in storms:
@@ -39,20 +31,18 @@ for storm in storms:
                          sep='	'
                          )
         
-        #this next line to convert some lons >180 to negatives (i.e. west of greenwich is optional)
+        
         df['lon']=df['lon'].where(df['lon']<180,df['lon']-360)
         
-        df=df.drop(columns=['blank']) #remove dummy column
+        df=df.drop(columns=['blank']) #getting rid of dummy column
 
-        #adding header info to .storm_header in the data [e.g. try print(df.storm_header)]
+        
         storm_header = 'start\t'+storm.split('\n')[0]
         df.storm_header = storm_header
-        #uncomment line below to save each storm as a separate csv file
-        #df.to_csv(storm_header.replace('\t','_')+'.csv')
         dfs.append(df)
      
         
-#simple plotting using cartopy and matplotlib
+
 def plot_storm(df):
     '''
     plot a storm track
@@ -60,16 +50,16 @@ def plot_storm(df):
     lons=df.lon
     lats=df.lat
     
-    ax = plt.axes(projection=ccrs.PlateCarree()) #try a few different projections here depending on where the storm is. All on https://scitools.org.uk/cartopy/docs/v0.15/crs/projections.html
-    ax.plot(lons,lats,transform=ccrs.PlateCarree()) #Plot the storm track
-    ax.set_extent([min(lons)-1,max(lons)+1,min(lats)-1,max(lons)+1]) #play around with axes extent
+    ax = plt.axes(projection=ccrs.PlateCarree()) 
+    ax.plot(lons,lats,transform=ccrs.PlateCarree()) 
+    ax.set_extent([min(lons)-1,max(lons)+1,min(lats)-1,max(lons)+1]) 
     ax.coastlines() #Add Coastlines
     plt.savefig('example.jpg')
     #plt.show()
     
-print(dfs[7].storm_header)
-print(dfs[7])
+print(dfs[6].storm_header)
+print(dfs[6])
 
 
-#plot_storm(dfs[7])
+plot_storm(dfs[6])
     
